@@ -4,6 +4,22 @@ Sistem deteksi dini banjir bertenaga AI yang dirancang khusus untuk kurikulum **
 
 ---
 
+## 🛠️ Persiapan Awal (Untuk Mahasiswa)
+Sebelum memulai, pastikan perangkat Anda sudah memiliki peralatan dasar berikut:
+
+1.  **Instalasi Git**:
+    - **Windows**: [git-scm.com](https://git-scm.com/download/win) (Pilih 64-bit Git for Windows Setup).
+    - **Mac**: Buka terminal, ketik `git --version` (macOS akan menawarkan instalasi otomatis).
+2.  **Instalasi Docker Desktop**:
+    - Unduh di [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/). Ini adalah "Mesin" yang akan menjalankan seluruh AI dlm proyek ini.
+3.  **Clone Proyek**:
+    ```bash
+    git clone https://github.com/amsopian22/demo-praktisi-mengajar.git
+    cd demo-praktisi-mengajar
+    ```
+
+---
+
 ## 🚀 Jalur Cepat (Demo Mode)
 Gunakan jalur ini jika Anda ingin langsung melihat hasil kerja AI dlm hitungan menit.
 
