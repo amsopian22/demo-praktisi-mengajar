@@ -123,8 +123,21 @@ Tahap ini melatih 4 jenis arsitektur AI secara paralel untuk menemukan prediktor
 - **Logistic Regression**: Baseline statistik untuk performa cepat.
 - **Neural Network (MLP)**: Menangkap pola nonlinear yang kompleks.
 
-**Evaluasi Multidimensi (Radar Chart):**
-Setiap model dinilai berdasarkan 5 parameter (F1, AUC, Precision, Recall, Kecepatan Latih) yang divisualisasikan dalam grafik Radar untuk demonstrasi praktisi yang sistematis.
+**🧬 Glosarium Metrik Evaluasi AI (Mengapa Ini Penting?)**
+Dalam sistem prediksi banjir, akurasi saja tidak cukup karena kejadian banjir sangat jarang terjadi (*Imbalanced Data*). Berikut adalah metrik yang kita gunakan untuk mengukur "kecerdasan" model:
+
+1.  **Precision (Presisi - Ketepatan)**:
+    - *Tanya:* "Dari semua peringatan banjir yang dikeluarkan AI, berapa banyak yang benar-benar terjadi?"
+    - *Pentingnya:* Menghindari **False Alarm** (Alarm Palsu). Precision yang rendah berarti warga disuruh mengungsi padahal tidak ada banjir, yang bisa menurunkan kepercayaan publik.
+2.  **Recall (Sensitivitas - Jangkauan)**:
+    - *Tanya:* "Dari semua kejadian banjir yang sesungguhnya terjadi, berapa banyak yang berhasil dideteksi AI?"
+    - *Pentingnya:* Menghindari **Missed Event**. Recall yang rendah berarti ada banjir yang tidak terdeteksi, yang berisiko menyebabkan jatuhnya korban atau kerugian karena warga tidak bersiap.
+3.  **F1-Score (Ekuilibrium)**:
+    - *Definisi:* Rata-rata harmonis antara Precision dan Recall.
+    - *Pentingnya:* Ini adalah **metrik utama** kita. Karena kita ingin meminimalkan False Alarm (Precision) SEKALIGUS meminimalkan Missed Event (Recall), F1-Score memberikan angka tunggal yang merepresentasikan keseimbangan kedua hal tersebut.
+4.  **AUC-ROC (Area Under the Curve)**:
+    - *Tanya:* "Seberapa jago AI membedakan antara titik yang aman vs titik yang berisiko banjir di seluruh Samarinda?"
+    - *Nilai:* 0.5 (Tebakan acak) hingga 1.0 (Sempurna). AUC memberitahu kita seberapa stabil model secara keseluruhan tanpa terpaku pada satu ambang batas (*threshold*) tertentu.
 
 ### Fase 5: Deployment & Inference
 Model yang sudah pintar tidak boleh hanya diam di komputer. Ia harus bekerja!
