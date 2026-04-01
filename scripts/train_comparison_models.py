@@ -77,9 +77,9 @@ def train_multiple_models():
     
     models = {
         "XGBoost": xgb.XGBClassifier(scale_pos_weight=pos_weight, random_state=42),
-        "RandomForest": RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42),
-        "LogisticRegression": LogisticRegression(max_iter=1000, class_weight='balanced', random_state=42),
-        "NeuralNetwork_MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42)
+        "Random Forest": RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42),
+        "Logistic Regression": LogisticRegression(max_iter=1000, class_weight='balanced', random_state=42),
+        "Neural Network": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42)
     }
 
     best_f1 = 0
