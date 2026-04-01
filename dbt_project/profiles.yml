@@ -1,0 +1,12 @@
+samarinda_elt:
+  outputs:
+    dev:
+      type: postgres
+      threads: 1
+      host: postgres
+      port: 5432
+      user: airflow
+      pass: airflow
+      dbname: airflow
+      schema: public
+  target: dev

@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: internal_db
+    database: airflow
+    schema: public
+    tables:
+      - name: bronze_weather_raw

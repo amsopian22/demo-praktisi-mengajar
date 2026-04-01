@@ -1,0 +1,26 @@
+# Ingestion & Data manipulation
+requests==2.31.0
+pandas==2.2.0
+numpy==1.26.4
+aiohttp==3.9.3
+
+# Database & ELT
+sqlalchemy==1.4.47
+psycopg2-binary==2.9.9
+dbt-postgres==1.7.0
+
+# Machine Learning
+xgboost==2.0.3
+scikit-learn==1.4.0
+scipy==1.11.4
+
+# MLflow
+mlflow==2.10.2
+
+# Drift Detection
+scikit-multiflow==0.5.3
+river==0.21.0
+
+# Airflow specific requests
+apache-airflow==2.8.1
+apache-airflow-providers-postgres==5.10.0

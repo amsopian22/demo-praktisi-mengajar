@@ -1,0 +1,143 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 181, 173, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PostgreSQL-MLOps"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.4 },
+              { "color": "red", "value": 0.7 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer",
+          "type": "default"
+        },
+        "controls": {
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "color": { "field": "risk_score", "fixed": "dark-blue" },
+              "opacity": 0.8,
+              "size": { "fixed": 15 },
+              "style": { "group": "level", "points": "circle" }
+            },
+            "location": { "lat": "latitude", "lon": "longitude", "mode": "coords" },
+            "name": "Titik Risiko Banjir AI",
+            "tooltip": true,
+            "type": "markers"
+          }
+        ],
+        "view": { "allLayers": true, "id": "coords", "lat": -0.5021, "lon": 117.1536, "zoom": 11 }
+      },
+      "title": "Demo Praktisi Mengajar - AI Flood Risk Prediction",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT predicted_at::timestamp AS time, latitude, longitude, risk_probability AS risk_score FROM gold_flood_predictions ORDER BY time DESC",
+          "refId": "A"
+        }
+      ],
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "PostgreSQL-MLOps"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "shades" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.5 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 14 },
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "Total Kelurahan Berisiko Tinggi",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT predicted_at AS time, COUNT(*) FROM gold_flood_predictions WHERE is_high_risk = 1 GROUP BY time",
+          "refId": "B"
+        }
+      ],
+      "type": "gauge"
+    }
+  ],
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["flood", "samarinda", "mlops"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Samarinda Real-time Flood Early Warning",
+  "uid": "flood-risk-samarinda",
+  "version": 2
+}

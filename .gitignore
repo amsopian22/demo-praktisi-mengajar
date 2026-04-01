@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# dbt
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+
+# Airflow
+logs/
+airflow.db
+standalone_admin_password.txt
+
+# MLflow
+mlruns/
+mlruns.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+.agent/
+.gemini/
