@@ -148,7 +148,7 @@ with tab1:
     col_map, col_details = st.columns([3, 1])
     
     with col_map:
-        st.subheader(f"3D Risk Mapping Visualization - {selected_model}")
+        st.subheader(f"🌐 2D Interactive Risk Intelligence - {selected_model}")
         df_all = load_data()
         
         if not df_all.empty:
@@ -158,13 +158,12 @@ with tab1:
                 df = df_all
                 
             if not df.empty:
-                # 3D Visual with ColumnLayer
-                # Mapping risk to height and color (Cyan-Blue to bright Red)
+                # Modern 2D Visual with ScatterplotLayer
                 view_state = pdk.ViewState(
                     latitude=-0.49,
                     longitude=117.14,
                     zoom=11.5,
-                    pitch=60,
+                    pitch=0,
                     bearing=0
                 )
 
