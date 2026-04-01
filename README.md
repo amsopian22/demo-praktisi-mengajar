@@ -8,19 +8,37 @@ Sistem deteksi dini banjir bertenaga AI untuk **Demo Praktisi Mengajar**. Mengim
 graph TD
     A[Open-Meteo API] -->|Ingest| B[(PostgreSQL Bronze)]
     B -->|dbt Transform| C[(PostgreSQL Silver/Gold)]
-    C -->|Feature Store| D[XGBoost Training]
-    D -->|Log Model/Metrics| E[MLflow Registry]
-    E -->|Best Model| F[Inference Script]
+    C -->|Feature Store| D[Battle of Models<br/>XGB, RF, LR, MLP]
+    D -->|Log Metrics| E[MLflow Comparison]
+    E -->|Best Model Selection| F[Inference Script]
     F -->|Risk Scoring| G[(PostgreSQL Predictions)]
     G -->|Visualization| H[Grafana Risk Map]
-    F -->|Notification| I[Discord/Slack]
+    G -->|Interactive| K[Streamlit Dashboard]
     B -->|Monitoring| J[ADWIN Drift Detection]
-    J -->|Trigger| D
+    J -->|Trigger Retrain| D
 ```
 
 ---
 
-## 🛠️ Persiapan Lingkungan (Setup)
+## 🛠️ Persiapan Awal & Clone
+
+Sebelum menjalankan proyek, pastikan Anda telah menginstal **Git** di komputer Anda. Ikuti panduan sesuai sistem operasi Anda:
+
+### 1. Instalasi Git
+- **Windows**: Unduh installer dari [git-scm.com](https://git-scm.com/download/win). Jalankan `.exe` dan ikuti instruksi.
+- **macOS**: Buka Terminal dan ketik `git install`. Atau gunakan Homebrew: `brew install git`.
+- **Linux (Ubuntu/Debian)**: `sudo apt update && sudo apt install git -y`.
+
+### 2. Clone Repositori
+Buka terminal/git bash, lalu jalankan:
+```bash
+git clone https://github.com/amsopian22/demo-praktisi-mengajar.git
+cd demo-praktisi-mengajar
+```
+
+---
+
+## ⚙️ Persiapan Lingkungan (Setup)
 
 ### 1. Menyiapkan Lingkungan Python Terisolasi (Venv)
 Sesuai aturan operasional, kita wajib memisahkan pustaka AI dengan Python sistem.
@@ -98,25 +116,15 @@ Dalam dunia nyata, pencatatan titik banjir historis seringkali tidak lengkap (*s
 
 Sistem memberikan label **Banjir (1)** jika memenuhi kriteria "Rainfall vs Elevation" (Contoh: Zona Rendah (< 10m) dengan Hujan 3 hari > 100mm). Teknik ini memungkinkan model mempelajari **pola risiko** berdasarkan interaksi antara topografi dan intensitas hujan, bukan sekadar menghafal kejadian masa lalu.
 
-### Fase 4: Modeling & Evaluation (XGBoost)
-Tahap ini adalah saat AI "belajar" dari data. Kita menggunakan algoritma **XGBoost (eXtreme Gradient Boosting)**.
+### Fase 4: Model Training (Battle of Models)
+Tahap ini melatih 4 jenis arsitektur AI secara paralel untuk menemukan prediktor banjir terbaik:
+- **XGBoost**: Spesialis data tabular tidak seimbang.
+- **Random Forest**: Model ensemble yang sangat stabil.
+- **Logistic Regression**: Baseline statistik untuk performa cepat.
+- **Neural Network (MLP)**: Menangkap pola nonlinear yang kompleks.
 
-#### **🤔 Kenapa Menggunakan XGBoost?**
-1.  **Raja Data Tabular**: Untuk data berbentuk tabel (seperti cuaca), XGBoost saat ini adalah salah satu yang terbaik di dunia, bahkan sering mengalahkan Deep Learning.
-2.  **Efisiensi Tinggi**: Sangat cepat dan irit memori, sesuai dengan target sistem kita yang harus berjalan di bawah **8GB RAM**.
-3.  **Tangangguh terhadap Data Bolong**: Cuaca lapangan seringkali memiliki data yang hilang (*Missing Values*). XGBoost punya kemampuan internal untuk menangani data yang tidak lengkap secara otomatis.
-
-#### **💡 Cara Kerja XGBoost (Analogi "Belajar dari Kesalahan")**
-Bayangkan sebuah kelas yang berisi 100 murid (Tree/Pohon Keputusan):
--   **Murid ke-1** mencoba menebak apakah akan banjir. Hasilnya lumayan, tapi dia salah menebak di wilayah yang datar.
--   **Murid ke-2** tidak mengulangi pekerjaan murid pertama dari nol. Dia khusus **fokus mempelajari kesalahan** murid pertama (wilayah datar).
--   **Murid ke-3** fokus mempelajari kesalahan gabungan murid ke-1 dan ke-2.
--   **Hasil Akhir**: Jawaban final adalah gabungan pendapat ke-100 murid tersebut, di mana setiap murid baru bertugas memperbaiki kesalahan murid sebelumnya. Inilah yang disebut dengan **Boosting**.
-
-**Konsep Penting lainnya:**
-1.  **Analogi Latihan Ujian (Chronological Splitting)**: Model melatih diri pada data masa lalu (2019-2023) dan diuji pada "Ujian Akhir" di tahun 2024 untuk memastikan ia bisa memprediksi masa depan, bukan sekadar menghafal.
-2.  **Menangani Data Langka (Scale Pos Weight)**: Karena banjir adalah kejadian langka (1:272), kita memberikan "instruksi khusus" agar AI memberikan perhatian ekstra pada label banjir (memberi bobot tinggi).
-3.  **Laboratorium Digital (MLflow)**: Semua percobaan latihan dicatat otomatis agar kita bisa membandingkan akurasi antar "angkatan" model.
+**Evaluasi Multidimensi (Radar Chart):**
+Setiap model dinilai berdasarkan 5 parameter (F1, AUC, Precision, Recall, Kecepatan Latih) yang divisualisasikan dalam grafik Radar untuk demonstrasi praktisi yang sistematis.
 
 ### Fase 5: Deployment & Inference
 Model yang sudah pintar tidak boleh hanya diam di komputer. Ia harus bekerja!
@@ -129,40 +137,21 @@ Model yang sudah pintar tidak boleh hanya diam di komputer. Ia harus bekerja!
 Ini adalah tahap akhir di mana hasil kerja AI bisa dinikmati oleh manusia (Operator).
 
 **Konsep Penting untuk Mahasiswa:**
-1.  **Analogi Menara Kontrol (Grafana)**: Grafana adalah layar monitor Pilot. Kita mengubah angka-angka rumit menjadi Peta Interaktif. Jika risiko > 70%, titik di peta akan berubah menjadi **MERAH**, memberi tahu operator untuk segera bertindak.
-2.  **Detektor Asap (ADWIN Drift Detection)**: Iklim bisa berubah (Data Drift). Jika pola hujan mendadak tidak wajar dibanding data latihan, algoritma ADWIN akan berbunyi seperti detektor asap, memerintahkan Airflow untuk melakukan **Retraining** (belajar ulang) agar model tidak ketinggalan zaman.
-
-## 🛠️ Persiapan Awal & Clone
-
-Sebelum menjalankan proyek, pastikan Anda telah menginstal **Git** di komputer Anda. Ikuti panduan sesuai sistem operasi Anda:
-
-### 1. Instalasi Git
-- **Windows**: Unduh installer dari [git-scm.com](https://git-scm.com/download/win). Jalankan `.exe` dan ikuti instruksi (direkomendasikan pilih "Git Bash" saat instalasi).
-- **macOS**: Buka Terminal dan ketik `git --version`. Jika belum ada, sistem akan menawarkan instalasi otomatis Xcode Command Line Tools. Atau gunakan Homebrew: `brew install git`.
-- **Linux (Ubuntu/Debian)**: Jalankan perintah berikut di terminal:
-  ```bash
-  sudo apt update
-  sudo apt install git -y
-  ```
-
-### 2. Clone Repositori
-Setelah Git terinstal, buat folder baru di komputer Anda, buka terminal/git bash, lalu jalankan:
-```bash
-git clone https://github.com/amsopian22/demo-praktisi-mengajar.git
-cd demo-praktisi-mengajar
-```
+-   **Dashboard Intelijen Modern (Streamlit)**: Menu simulasi baru yang mendukung:
+    -   **Peta Risiko 2D Modern**: Visualisasi titik risiko dengan skema warna *neon* di atas peta radar gelap.
+    -   **Model Lab Selection**: Fitur beralih "Otak AI" secara instan untuk melihat variasi prediksi.
+    -   **Radar Performance Profile**: Grafik evaluasi performa model yang komprehensif.
 
 ---
-## ⚙️ Cara Menjalankan Proyek
-
+## 🖼️ Galeri Antarmuka Sistem
 ````carousel
 ![Dashboard Grafana - AI Flood Prediction](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/grafana_dashboard_demo_1775007204662.png)
 <!-- slide -->
+![Radar Chart Evaluation - Battle of Models](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/walkthrough_radar_demo.png)
+<!-- slide -->
+![Streamlit Modern 2D Map](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/streamlit_2d_modern.png)
+<!-- slide -->
 ![Orchestrator Airflow - Pipeline Flood AI](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/airflow_dag_demo_1775007185490.png)
-<!-- slide -->
-![Tracking Experiment MLflow](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/mlflow_experiments_demo_1775007222819.png)
-<!-- slide -->
-![Database Management via pgAdmin](/Users/bidang4/.gemini/antigravity/brain/a9863dc2-6d9d-4cda-bdce-39c22c88ed03/pgadmin_database_demo_1775007237758.png)
 ````
 
 ---
@@ -172,6 +161,7 @@ cd demo-praktisi-mengajar
 | :--- | :--- | :--- |
 | **Airflow** | `http://localhost:8080` | Manager Operasional (*Orchestrator*) |
 | **Grafana** | `http://localhost:3001` | Dashboard Visual (*Observability*) |
+| **Streamlit** | `http://localhost:8501` | Dashboard Simulasi (*Interactive Analysis*) |
 | **MLflow** | `http://localhost:5001` | Laboratorium Percobaan (*Tracking*) |
 | **pgAdmin** | `http://localhost:5050` | Gudang Data (*Database Mgmt*) |
 
