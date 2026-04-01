@@ -12,7 +12,13 @@ DB_URL = "postgresql://airflow:airflow@postgres:5432/airflow"
 
 import socket
 
-MLFLOW_URL = "http://192.168.147.4:5000"
+import socket
+try:
+    # Resolusi IP dinamis untuk memintas proteksi Host Header MLflow
+    MLFLOW_IP = socket.gethostbyname("mlflow")
+    MLFLOW_URL = f"http://{MLFLOW_IP}:5000"
+except Exception:
+    MLFLOW_URL = os.getenv("MLFLOW_URL", "http://localhost:5000")
 
 def get_latest_features():
     """

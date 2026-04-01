@@ -20,6 +20,26 @@ graph TD
 
 ---
 
+## 🚀 Quick Start (Demo Mode)
+
+Jika Anda baru saja melakukan **`git clone`**, ikuti 3 langkah cepat ini untuk menyalakan seluruh infrastruktur demo:
+
+1.  **Nyalakan Infrastruktur** (Postgres, Airflow, MLflow, Grafana, Streamlit):
+    ```bash
+    docker-compose up -d
+    ```
+2.  **Jalankan Pelatihan AI Awal** (Battle of Models):
+    *Tunggu 1 menit agar database siap, lalu jalankan:*
+    ```bash
+    docker exec -u 50000 demo-prediksi-praktisi-mengajar-airflow-scheduler-1 python /opt/airflow/scripts/train_comparison_models.py
+    ```
+3.  **Akses Dashboard**:
+    - **Streamlit**: [http://localhost:8501](http://localhost:8501) (Peta Risiko & Performa AI)
+    - **MLflow**: [http://localhost:5001](http://localhost:5001) (Metrik Eksperimen)
+    - **Airflow**: [http://localhost:8080](http://localhost:8080) (Orkestrasi Pipeline)
+
+---
+
 ## 🛠️ Persiapan Awal & Clone
 
 Sebelum menjalankan proyek, pastikan Anda telah menginstal **Git** di komputer Anda. Ikuti panduan sesuai sistem operasi Anda:

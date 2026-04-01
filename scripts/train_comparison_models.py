@@ -22,7 +22,13 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "airflow")
 
 # Configuration
-MLFLOW_URL = "http://192.168.147.4:5000"
+import socket
+try:
+    # Resolusi IP dinamis untuk memintas proteksi Host Header MLflow
+    MLFLOW_IP = socket.gethostbyname("mlflow")
+    MLFLOW_URL = f"http://{MLFLOW_IP}:5000"
+except Exception:
+    MLFLOW_URL = os.getenv("MLFLOW_URL", "http://localhost:5000")
 
 def load_gold_data():
     try:

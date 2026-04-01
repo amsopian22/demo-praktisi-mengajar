@@ -43,7 +43,13 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 DB_URL = os.getenv("DB_URL", "postgresql://airflow:airflow@postgres:5432/airflow")
-MLFLOW_URL = "http://192.168.147.4:5000"
+import socket
+try:
+    # Resolusi IP dinamis untuk memintas proteksi Host Header MLflow
+    MLFLOW_IP = socket.gethostbyname("mlflow")
+    MLFLOW_URL = f"http://{MLFLOW_IP}:5000"
+except Exception:
+    MLFLOW_URL = os.getenv("MLFLOW_URL", "http://localhost:5000")
 
 # --- DATA LOADING FUNCTIONS ---
 def load_data():
