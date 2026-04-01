@@ -43,7 +43,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 DB_URL = os.getenv("DB_URL", "postgresql://airflow:airflow@postgres:5432/airflow")
-MLFLOW_URL = os.getenv("MLFLOW_TRACKING_URI", "http://192.168.147.4:5000")
+MLFLOW_URL = "http://192.168.147.4:5000"
 
 # --- DATA LOADING FUNCTIONS ---
 def load_data():

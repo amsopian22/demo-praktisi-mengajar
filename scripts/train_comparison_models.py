@@ -2,7 +2,7 @@ import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import f1_score, roc_auc_score, recall_score
+from sklearn.metrics import f1_score, roc_auc_score, recall_score, precision_score
 import pandas as pd
 import numpy as np
 import mlflow
@@ -14,21 +14,21 @@ import os
 import sys
 import socket
 
-# Configuration
-MLFLOW_URL = os.getenv("MLFLOW_TRACKING_URI", "http://192.168.147.4:5000")
+# Database Credentials
+DB_USER = os.getenv("DB_USER", "airflow")
+DB_PASS = os.getenv("DB_PASS", "airflow")
+DB_HOST = os.getenv("DB_HOST", "postgres")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "airflow")
 
-if "mlflow:5000" in MLFLOW_URL:
-    try:
-        _mlflow_ip = socket.gethostbyname("mlflow")
-        MLFLOW_URL = MLFLOW_URL.replace("mlflow:5000", f"{_mlflow_ip}:5000")
-    except Exception:
-        pass
+# Configuration
+MLFLOW_URL = "http://192.168.147.4:5000"
 
 def load_gold_data():
     try:
         db_url = f'postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
         engine = create_engine(db_url)
-        query = "SELECT * FROM gold_features_ml WHERE proxy_target_flood IS NOT NULL ORDER BY timestamp ASC"
+        query = "SELECT * FROM gold_features_ml WHERE proxy_target_flood IS NOT NULL ORDER BY RANDOM() LIMIT 100000"
         with engine.connect() as conn:
             result = conn.execute(text(query))
             rows = result.fetchall()
@@ -76,10 +76,10 @@ def train_multiple_models():
     mlflow.set_experiment("Samarinda_Flood_Comparison")
     
     models = {
-        "XGBoost": xgb.XGBClassifier(scale_pos_weight=pos_weight, random_state=42),
-        "Random Forest": RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42),
-        "Logistic Regression": LogisticRegression(max_iter=1000, class_weight='balanced', random_state=42),
-        "Neural Network": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42)
+        "XGBoost": xgb.XGBClassifier(n_estimators=50, max_depth=6, scale_pos_weight=pos_weight, random_state=42, n_jobs=-1),
+        "Random Forest": RandomForestClassifier(n_estimators=50, max_depth=10, class_weight='balanced', random_state=42, n_jobs=-1),
+        "Logistic Regression": LogisticRegression(max_iter=100, class_weight='balanced', random_state=42),
+        "Neural Network": MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=100, random_state=42)
     }
 
     best_f1 = 0
@@ -114,6 +114,7 @@ def train_multiple_models():
             f1 = f1_score(y_test, final_preds, zero_division=0)
             auc = roc_auc_score(y_test, preds_proba) if len(np.unique(y_test)) > 1 else 0.5
             recall = recall_score(y_test, final_preds, zero_division=0)
+            precision = precision_score(y_test, final_preds, zero_division=0)
 
             # Metadata Logging
             mlflow.log_param("model_architecture", name)
@@ -121,6 +122,7 @@ def train_multiple_models():
                 "f1_score": f1,
                 "auc": auc,
                 "recall": recall,
+                "precision": precision,
                 "training_time": train_time,
                 "optimal_threshold": best_threshold
             })

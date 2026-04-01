@@ -12,14 +12,7 @@ DB_URL = "postgresql://airflow:airflow@postgres:5432/airflow"
 
 import socket
 
-MLFLOW_URL = os.getenv("MLFLOW_TRACKING_URI", "http://192.168.147.4:5000")
-
-if "mlflow:5000" in MLFLOW_URL:
-    try:
-        _mlflow_ip = socket.gethostbyname("mlflow")
-        MLFLOW_URL = MLFLOW_URL.replace("mlflow:5000", f"{_mlflow_ip}:5000")
-    except Exception:
-        pass
+MLFLOW_URL = "http://192.168.147.4:5000"
 
 def get_latest_features():
     """
