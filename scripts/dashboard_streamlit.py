@@ -158,6 +158,11 @@ with tab1:
                 df = df_all
                 
             if not df.empty:
+                # Add calculated columns for tooltip
+                df = df.copy()
+                df['risk_pct'] = (df['risk_probability'] * 100).round(2).astype(str) + "%"
+                df['status_label'] = df['is_high_risk'].apply(lambda x: "⚠️ BAHAYA" if x == 1 else "✅ AMAN")
+
                 # Modern 2D Visual with ScatterplotLayer
                 view_state = pdk.ViewState(
                     latitude=-0.49,
@@ -190,7 +195,12 @@ with tab1:
                     layers=[layer],
                     initial_view_state=view_state,
                     map_style="mapbox://styles/mapbox/dark-v11",
-                    tooltip={"text": "Model: {model_name}\nProbabilitas: {risk_probability:.2f}\nStatus: {is_high_risk}"}
+                    tooltip={
+                        "html": "<b>Model:</b> {model_name}<br/>"
+                                "<b>Probabilitas:</b> {risk_pct}<br/>"
+                                "<b>Status:</b> {status_label}",
+                        "style": {"color": "white", "backgroundColor": "#0e1117", "border": "1px solid #30363d"}
+                    }
                 ))
             else:
                 st.warning("Data model ini belum siap di database.")
