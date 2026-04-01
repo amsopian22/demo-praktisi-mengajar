@@ -22,6 +22,27 @@ Gunakan jalur ini jika Anda ingin langsung melihat hasil kerja AI dlm hitungan m
 
 ---
 
+## 📦 Cara Mengisi Data (Initial Load)
+Jika Anda baru pertama kali menjalankan proyek di komputer baru, database Anda akan **kosong**. Ikuti urutan ini untuk mengisi 2,6 Juta baris data historis:
+
+1.  **Tarik Data Cuaca 5 Tahun** (Ingest dari Open-Meteo API):
+    *Proses ini menggunakan teknologi `asyncio` agar penarikan jutaan baris tetap cepat.*
+    ```bash
+    docker exec -it demo-prediksi-praktisi-mengajar-airflow-scheduler-1 python /opt/airflow/scripts/ingest_open_meteo.py --initial
+    ```
+2.  **Masak Data Mentah** (Transformasi dbt):
+    *Mengubah data mentah menjadi Feature Store di lapisan Silver & Gold.*
+    ```bash
+    docker exec -it demo-prediksi-praktisi-mengajar-airflow-scheduler-1 python /opt/airflow/scripts/run_elt_pipeline.py --layer gold
+    ```
+3.  **Latih Otak AI** (Battle of Models):
+    *Melatih 4 model sekaligus (XGB, RF, LR, NN) dengan sampling 100k data.*
+    ```bash
+    docker exec -it demo-prediksi-praktisi-mengajar-airflow-scheduler-1 python /opt/airflow/scripts/train_comparison_models.py
+    ```
+
+---
+
 ## 🎓 Jalur Belajar: Menjadi Data Scientist Samarinda
 Proyek ini membagi pekerjaan Data Science ke dalam **4 Tahap Besar** yang bisa dipelajari satu per satu.
 
