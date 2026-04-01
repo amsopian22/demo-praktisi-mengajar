@@ -145,78 +145,64 @@ tab1, tab2 = st.tabs(["🏙️ Risk Intelligence (3D Map)", "📉 Model Performa
 metrics_df = load_mlflow_metrics()
 
 with tab1:
-    col_map, col_details = st.columns([3, 1])
+    st.subheader(f"🌐 2D Interactive Risk Intelligence - {selected_model}")
+    df_all = load_data()
     
-    with col_map:
-        st.subheader(f"🌐 2D Interactive Risk Intelligence - {selected_model}")
-        df_all = load_data()
-        
-        if not df_all.empty:
-            if 'model_name' in df_all.columns:
-                df = df_all[df_all['model_name'] == selected_model]
-            else:
-                df = df_all
-                
-            if not df.empty:
-                # Add calculated columns for tooltip
-                df = df.copy()
-                df['risk_pct'] = (df['risk_probability'] * 100).round(2).astype(str) + "%"
-                df['status_label'] = df['is_high_risk'].apply(lambda x: "⚠️ BAHAYA" if x == 1 else "✅ AMAN")
-
-                # Modern 2D Visual with ScatterplotLayer
-                view_state = pdk.ViewState(
-                    latitude=-0.49,
-                    longitude=117.14,
-                    zoom=11.5,
-                    pitch=0,
-                    bearing=0
-                )
-
-                layer = pdk.Layer(
-                    "ScatterplotLayer",
-                    df,
-                    get_position=["longitude", "latitude"],
-                    get_radius=300,
-                    get_fill_color=[
-                        "risk_probability * 255", 
-                        "(1 - risk_probability) * 200", 
-                        "255 * (1-risk_probability)", 
-                        200
-                    ],
-                    pickable=True,
-                    opacity=0.8,
-                    stroked=True,
-                    filled=True,
-                    radius_min_pixels=8,
-                    radius_max_pixels=100,
-                )
-
-                st.pydeck_chart(pdk.Deck(
-                    layers=[layer],
-                    initial_view_state=view_state,
-                    map_style="mapbox://styles/mapbox/dark-v11",
-                    tooltip={
-                        "html": "<b>Model:</b> {model_name}<br/>"
-                                "<b>Probabilitas:</b> {risk_pct}<br/>"
-                                "<b>Status:</b> {status_label}",
-                        "style": {"color": "white", "backgroundColor": "#0e1117", "border": "1px solid #30363d"}
-                    }
-                ))
-            else:
-                st.warning("Data model ini belum siap di database.")
+    if not df_all.empty:
+        if 'model_name' in df_all.columns:
+            df = df_all[df_all['model_name'] == selected_model]
         else:
-            st.info("Sistem sedang menunggu aliran data pertama dari Airflow...")
-
-    with col_details:
-        st.subheader("📊 Statistics")
-        if not df_all.empty and not metrics_df.empty:
-            model_info = metrics_df[metrics_df["Model"] == selected_model]
-            if not model_info.empty:
-                st.metric("Model F1-Score", f"{model_info['F1-Score'].values[0]:.4f}")
-                st.metric("Training Speed", f"{model_info['Train Time (s)'].values[0]:.2f}s")
+            df = df_all
             
-            high_risk_count = len(df[df['is_high_risk'] == 1])
-            st.metric("Wilayah Waspada", high_risk_count, delta="Real-time")
+        if not df.empty:
+            # Add calculated columns for tooltip
+            df = df.copy()
+            df['risk_pct'] = (df['risk_probability'] * 100).round(2).astype(str) + "%"
+            df['status_label'] = df['is_high_risk'].apply(lambda x: "⚠️ BAHAYA" if x == 1 else "✅ AMAN")
+
+            # Modern 2D Visual with ScatterplotLayer
+            view_state = pdk.ViewState(
+                latitude=-0.49,
+                longitude=117.14,
+                zoom=11.5,
+                pitch=0,
+                bearing=0
+            )
+
+            layer = pdk.Layer(
+                "ScatterplotLayer",
+                df,
+                get_position=["longitude", "latitude"],
+                get_radius=300,
+                get_fill_color=[
+                    "risk_probability * 255", 
+                    "(1 - risk_probability) * 200", 
+                    "255 * (1-risk_probability)", 
+                    200
+                ],
+                pickable=True,
+                opacity=0.8,
+                stroked=True,
+                filled=True,
+                radius_min_pixels=8,
+                radius_max_pixels=100,
+            )
+
+            st.pydeck_chart(pdk.Deck(
+                layers=[layer],
+                initial_view_state=view_state,
+                map_style="mapbox://styles/mapbox/dark-v11",
+                tooltip={
+                    "html": "<b>Model:</b> {model_name}<br/>"
+                            "<b>Probabilitas:</b> {risk_pct}<br/>"
+                            "<b>Status:</b> {status_label}",
+                    "style": {"color": "white", "backgroundColor": "#0e1117", "border": "1px solid #30363d"}
+                }
+            ))
+        else:
+            st.warning("Data model ini belum siap di database.")
+    else:
+        st.info("Sistem sedang menunggu aliran data pertama dari Airflow...")
 
     # Recent Weather Table
     st.markdown("---")
