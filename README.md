@@ -4,6 +4,24 @@ Sistem deteksi dini banjir bertenaga AI yang dirancang khusus untuk kurikulum **
 
 ---
 
+## 🧬 Arsitektur Sistem (Data Flow)
+
+```mermaid
+graph TD
+    A[Open-Meteo API] -->|Ingest| B[(PostgreSQL Bronze)]
+    B -->|dbt Transform| C[(PostgreSQL Silver/Gold)]
+    C -->|Feature Store| D[Battle of Models<br/>XGB, RF, LR, NN]
+    D -->|Log Metrics| E[MLflow Tracking]
+    E -->|Deployment| F[Prediction Script]
+    F -->|Risk Scoring| G[(PostgreSQL Gold Predictions)]
+    G -->|Visualization| H[Grafana Risk Map]
+    G -->|Interactive| K[Streamlit 2D Map]
+    B -->|Monitoring| J[ADWIN Drift Detection]
+    J -->|Trigger Retrain| D
+```
+
+---
+
 ## 🛠️ Persiapan Awal (Untuk Mahasiswa)
 Sebelum memulai, pastikan perangkat Anda sudah memiliki peralatan dasar berikut:
 
