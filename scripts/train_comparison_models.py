@@ -34,7 +34,7 @@ def load_gold_data():
     try:
         db_url = f'postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
         engine = create_engine(db_url)
-        query = "SELECT * FROM gold_features_ml WHERE proxy_target_flood IS NOT NULL ORDER BY RANDOM() LIMIT 100000"
+        query = "SELECT * FROM gold_features_ml WHERE proxy_target_flood IS NOT NULL ORDER BY RANDOM() LIMIT 100000" # hapus dari order ke 100000 untuk melatih seluruh data
         with engine.connect() as conn:
             result = conn.execute(text(query))
             rows = result.fetchall()

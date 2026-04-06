@@ -106,6 +106,19 @@ services:
     depends_on:
       - postgres
 
+  streamlit:
+    <<: *airflow-common
+    entrypoint: []
+    command: /bin/bash -c "streamlit run /opt/airflow/scripts/dashboard_streamlit.py --server.port 8501 --server.address 0.0.0.0"
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_URL=postgresql://airflow:airflow@postgres:5432/airflow
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - postgres
+      - mlflow
+
 volumes:
   postgres-data:
   mlflow-data:

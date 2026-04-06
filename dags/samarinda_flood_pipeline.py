@@ -54,9 +54,9 @@ with DAG(
     # ==============================
     # This also acts as the webhook target for ADWIN drift detection.
     # Chronological splitting and MLflow logging are handled inside the script.
-    task_train_xgboost = BashOperator(
-        task_id='train_xgboost_chronological',
-        bash_command='python /opt/airflow/scripts/train_xgboost.py'
+    task_train_models = BashOperator(
+        task_id='train_comparison_models',
+        bash_command='python /opt/airflow/scripts/train_comparison_models.py'
     )
 
     # ==============================
@@ -81,7 +81,7 @@ with DAG(
         task_ingest_open_meteo,
         task_elt_silver,
         task_elt_gold,
-        task_train_xgboost,
+        task_train_models,
         task_predict_flood,
         task_update_grafana_observability
     )
